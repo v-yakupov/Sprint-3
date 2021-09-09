@@ -9,7 +9,7 @@ import java.util.LinkedList
  * Отдел кадров.
  */
 object HrDepartment {
-    private var clock = Clock.systemUTC()
+    var clock = Clock.systemUTC()
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
     private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
