@@ -27,16 +27,17 @@ class Grep {
             .collect(Collectors.toList())
         val nbw = Files.newBufferedWriter(resFile.toPath(), Charset.forName("UTF-8"))
 
-        files.forEach { file ->
-            var lineIndex = 0
-            file.forEachLine { line ->
-                lineIndex++
-                if (line.contains(subString)) {
-                    nbw.write("${file.fileName} : $lineIndex : $line" + System.lineSeparator())
-                    nbw.flush()
+        nbw.use {
+            files.forEach { file ->
+                var lineIndex = 0
+                file.forEachLine { line ->
+                    lineIndex++
+                    if (line.contains(subString)) {
+                        nbw.write("${file.fileName} : $lineIndex : $line" + System.lineSeparator())
+                        nbw.flush()
+                    }
                 }
             }
         }
-        nbw.close()
     }
 }

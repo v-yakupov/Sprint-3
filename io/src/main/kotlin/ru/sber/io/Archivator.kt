@@ -19,21 +19,29 @@ class Archivator {
      */
     fun zipLogfile(inputFile: File) {
         val outputFile = File(inputFile.parentFile.absolutePath + File.separator + inputFile.nameWithoutExtension + ".zip")
-        val fis = FileInputStream(inputFile)
-        val fos = FileOutputStream(outputFile)
-        val zos = ZipOutputStream(fos)
+        var fis: FileInputStream? = null
+        var fos: FileOutputStream? = null
+        var zos: ZipOutputStream? = null
         val buffer = ByteArray(4 * 1024)
-        var length: Int = fis.read(buffer)
+        var length: Int
 
-        zos.putNextEntry(ZipEntry(inputFile.name))
-        while (length != -1) {
-            zos.write(buffer, 0, length)
+        try {
+            fis = FileInputStream(inputFile)
+            fos = FileOutputStream(outputFile)
+            zos = ZipOutputStream(fos)
             length = fis.read(buffer)
+
+            zos.putNextEntry(ZipEntry(inputFile.name))
+            while (length != -1) {
+                zos.write(buffer, 0, length)
+                length = fis.read(buffer)
+            }
+        } finally {
+            zos?.closeEntry()
+            zos?.close()
+            fos?.close()
+            fis?.close()
         }
-        zos.closeEntry()
-        zos.close()
-        fos.close()
-        fis.close()
     }
 
     /**
@@ -41,30 +49,36 @@ class Archivator {
      * Извлечь из архива logfile.zip файл и сохарнить его в том же каталоге с именем unzippedLogfile.log
      */
     fun unzipLogfile(inputFile: File) {
-        val fis = FileInputStream(inputFile)
-        val zis = ZipInputStream(fis)
+        var fis:FileInputStream? = null
+        var zis: ZipInputStream? = null
+        var zipEntry: ZipEntry?
+        var fos: FileOutputStream?
         val buffer = ByteArray(4 * 1024)
-        var zipEntry = zis.nextEntry
         var outputFile: File
-        var fos: FileOutputStream
         var length: Int
 
-        while (zipEntry != null) {
-            outputFile = File(inputFile.parentFile.absolutePath + File.separator + zipEntry.name)
-            fos = FileOutputStream(outputFile)
-            length = zis.read(buffer)
-
-            while (length != -1) {
-                fos.write(buffer, 0, length)
-                length = zis.read(buffer)
-            }
-
-            zis.closeEntry()
-            fos.close()
+        try {
+            fis = FileInputStream(inputFile)
+            zis = ZipInputStream(fis)
             zipEntry = zis.nextEntry
-        }
 
-        zis.close()
-        fis.close()
+            while (zipEntry != null) {
+                outputFile = File(inputFile.parentFile.absolutePath + File.separator + zipEntry.name)
+                fos = FileOutputStream(outputFile)
+                length = zis.read(buffer)
+
+                while (length != -1) {
+                    fos.write(buffer, 0, length)
+                    length = zis.read(buffer)
+                }
+
+                zis.closeEntry()
+                fos.close()
+                zipEntry = zis.nextEntry
+            }
+        } finally {
+            zis?.close()
+            fis?.close()
+        }
     }
 }
