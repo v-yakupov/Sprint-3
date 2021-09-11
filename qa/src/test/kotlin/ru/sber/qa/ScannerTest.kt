@@ -24,12 +24,15 @@ internal class ScannerTest {
     }
 
     @Test
-    fun getScanData() {
+    fun `getScanData() should throw ScanTimeoutException on timeout`() {
+        every { Random.nextLong(5000L, 15000L) } returns Scanner.SCAN_TIMEOUT_THRESHOLD + 1
+        assertThrows<ScanTimeoutException> { Scanner.getScanData() }
+    }
+
+    @Test
+    fun `getScanData() should return data`() {
         every { Random.nextLong(5000L, 15000L) } returns Scanner.SCAN_TIMEOUT_THRESHOLD - 1
         assertTrue(Scanner.getScanData() is ByteArray)
         assertEquals(100, Scanner.getScanData().size)
-
-        every { Random.nextLong(5000L, 15000L) } returns Scanner.SCAN_TIMEOUT_THRESHOLD + 1
-        assertThrows<ScanTimeoutException> { Scanner.getScanData() }
     }
 }

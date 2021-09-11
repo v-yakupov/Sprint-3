@@ -23,7 +23,7 @@ internal class CertificateRequestTest {
     }
 
     @Test
-    fun process() {
+    fun `process() should return correct data`() {
         every { Scanner.getScanData() } returns Random.nextBytes(100)
         val data = Scanner.getScanData()
         val hrEmployeeNumber = 1L

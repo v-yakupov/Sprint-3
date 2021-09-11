@@ -25,16 +25,32 @@ internal class HrDepartmentTest {
     }
 
     @Test
-    fun receiveRequest() {
+    fun `receiveRequest() should throw WeekendDayException on Sunday`() {
         every { hrDepartment.clock } returns Clock.fixed(sunday, ZoneOffset.UTC.normalized())
         assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certLABOUR) }
+        assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certNDFL) }
+    }
 
+    @Test
+    fun `receiveRequest() should throw NotAllowReceiveRequestException for LABOUR_BOOK on Monday`() {
         every { hrDepartment.clock } returns Clock.fixed(monday, ZoneOffset.UTC.normalized())
         assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certLABOUR) }
-        assertDoesNotThrow { HrDepartment.receiveRequest(certNDFL) }
+    }
 
+    @Test
+    fun `receiveRequest() should NOT throw exception for NDFL on Monday`() {
+        every { hrDepartment.clock } returns Clock.fixed(monday, ZoneOffset.UTC.normalized())
+        assertDoesNotThrow { HrDepartment.receiveRequest(certNDFL) }
+    }
+    @Test
+    fun `receiveRequest() should throw NotAllowReceiveRequestException for NDFL on Tuesday`() {
         every { hrDepartment.clock } returns Clock.fixed(tuesday, ZoneOffset.UTC.normalized())
         assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certNDFL) }
+    }
+
+    @Test
+    fun `receiveRequest() should NOT throw exception for LABOUR_BOOK on Tuesday`() {
+        every { hrDepartment.clock } returns Clock.fixed(tuesday, ZoneOffset.UTC.normalized())
         assertDoesNotThrow { HrDepartment.receiveRequest(certLABOUR) }
     }
 }
